@@ -40,16 +40,17 @@ app.get("/hello", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  const shortURL = console.log(generateRandomString()); 
+  const longURL = req.body.longURL;
   console.log(req.body);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 function generateRandomString() {
-  let randomString = Buffer.from(Math.random().toString()).toString("base64").substr(10, 6);
-  console.log(randomString);
+  return Buffer.from(Math.random().toString()).toString("base64").substr(10, 6);
 }
 
-generateRandomString();
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
