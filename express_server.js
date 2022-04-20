@@ -14,6 +14,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 app.get("/urls", (req, res) => {
   const templateVars = { 
     username: "",
@@ -57,7 +70,16 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//--------------get/post_wall_DONOTCROSS😤👺-------------------//
+app.get("/register", (req, res) => {
+  const templateVars = { username: "" };
+    if (req.cookies && req.cookies["username"]) {
+      templateVars.username = req.cookies["username"];
+    }
+  res.render("urls_registration", templateVars);
+});
+
+
+//--------------get/post_wall_DO_NOT_CROSS😤👺-------------------//
 
 
 app.post("/urls", (req, res) => {
@@ -87,6 +109,22 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls/"); 
 });
+
+app.post("/register", (req, res) => {
+  console.log(req);
+  const id  = generateRandomString(); 
+  user = { 
+    id: id,
+    email: req.body.email,
+    password: req.body.password
+  }
+  users[id] = user;
+  res.cookie("user_id", id);
+  console.log(users);
+  res.redirect(`/urls`);
+});
+
+
 
 
 function generateRandomString() {
