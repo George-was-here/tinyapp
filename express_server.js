@@ -52,6 +52,16 @@ app.post("/urls", (req, res) => {
   res.redirect(`urls/${shortURL}`);        // Respond with 'Ok' (we will replace this)
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls/"); 
+  // const shortURL = generateRandomString(); 
+  // const longURL = req.body.longURL;
+  // urlDatabase[shortURL] = longURL;
+  // res.redirect(`urls/${shortURL}`);        // Respond with 'Ok' (we will replace this)
+});
+
 function generateRandomString() {
   return Buffer.from(Math.random().toString()).toString("base64").substr(10, 6);
 }
