@@ -20,8 +20,10 @@
           <div style="width:35%;">
           <div class="input-group-append">
             <h5>New URL:</h5>
-            <input type="text" class="form-control" placeholder="http://" aria-label="URL to edit" aria-describedby="button-addon2" style="width: 300px;">
-            <button class="btn btn-primary" type="button" id="button-addon2">Button</button>
+            <form method="POST" action=<%= `/urls/${shortURL}/update` %>>
+            <input type="text" class="form-control" name="updatedURL" placeholder="http://" aria-label="URL to edit" aria-describedby="button-addon2" style="width: 300px;">
+            <button class="btn btn-primary" type="submit" id="button-addon2">Button</button>
+            </form>
           </div>
         </div>
         </center>

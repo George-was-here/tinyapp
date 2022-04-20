@@ -49,13 +49,17 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(); 
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  res.redirect(`urls/${shortURL}`);        // Respond with 'Ok' (we will replace this)
+  res.redirect(`urls/${shortURL}`);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  console.log("DATABASE -shortURL", urlDatabase[req.params.shortURL]);
-  console.log("DATABASE", urlDatabase);
   delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls/"); 
+});
+
+app.post("/urls/:shortURL/update", (req, res) => {
+  // console.log("REQ", req);
+  urlDatabase[req.params.shortURL] = req.body.updatedURL;
   res.redirect("/urls/"); 
 });
 
