@@ -17,8 +17,8 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Edit</th>
           <th scope="col">Delete</th>
-          <th scope="col">Edit URL</th>
         </tr>
       </thead>
       <tbody>
@@ -27,8 +27,8 @@
             <tr>
               <td><a href=<%= `/urls/${url}` %>><%= url %></a></td>
               <td><%= urls[url] %></td>
+              <td><a class="btn btn-primary" role="button" style="color:goldenrod;background-color:rgb(30, 61, 147);" href=<%= `/urls/${url}` %>>Edit</a></td>
               <td><button type="submit" class="btn btn-danger">Delete</button></td>
-              <td><a style="color:goldenrod;background-color:rgb(30, 61, 147);" href=<%= `/urls/${url}` %>>Edit</a></td>
             </tr>
           </form>
         <% } %>
