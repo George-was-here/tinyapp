@@ -9,10 +9,10 @@
           <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
           <div style="position:absolute;right: 0; margin-right: 20px;">
-            <form method="POST" action=<%= username ? '/logout' : '/login' %>>
+            <form method="POST" action=<%= user ? '/logout' : '/login' %>>
               <div class="input-group mb-3">
-                <% if(username) {%>
-                <span>Logged in as: <%= username %>! </span>
+                <% if(user) {%>
+                <span>Logged in as: <%= user.email %>! </span>
                 <button class="btn btn-primary" type="submit">Logout</button>
                 <% } else { %>
                 <input type="text" class="form-control" placeholder="Username" aria-label="Username" name="username" aria-describedby="basic-addon2">
