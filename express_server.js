@@ -43,8 +43,10 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase };
   if (req.cookies && req.cookies["user_id"]) {
     templateVars.user = users[req.cookies["user_id"]];
+    res.render("urls_new", templateVars);
+    return;
   }
-  res.render("urls_new", templateVars);
+  res.redirect("/login");
 });
 
 app.get("/", (req, res) => {
@@ -95,6 +97,11 @@ app.get("/login", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
+  if (!(req.cookies && req.cookies["user_id"])) {
+    res.status(403);
+    res.end("403: Error, thou shall login!");
+    return;
+  }
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
