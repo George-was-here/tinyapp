@@ -82,6 +82,14 @@ app.get("/register", (req, res) => {
   res.render("urls_registration", templateVars);
 });
 
+app.get("/login", (req, res) => {
+  const templateVars = { user: null };
+  if (req.cookies && req.cookies["user_id"]) {
+    templateVars.user = users[req.cookies["user_id"]];
+  }
+  res.render("urls_login", templateVars);
+});
+
 
 //--------------get/post_wall_DO_NOT_CROSS😤👺-------------------//
 
@@ -104,9 +112,27 @@ app.post("/urls/:shortURL/update", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls/");
+  const emailValue = req.body.email;
+  const passwordValue = req.body.password;
+  if (!emailAlreadyInUse(emailValue)) {
+    res.status(403);
+    res.end("403: Error, email could not be located!");
+    return;
+  }
+  const user = findUserViaEmail(emailValue);
+  if (user) {
+    if (user.password !== passwordValue) {
+      res.status(403);
+      res.end("403: Error, password is invalid.");
+      return;
+    }
+    res.cookie('user_id', user.id);
+    res.redirect("/urls/");
+  }
 });
+
+// If a user with that e-mail address is located, compare the password given in the form with the existing user's password. If it does not match, return a response with a 403 status code.
+// If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
 
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
@@ -151,6 +177,15 @@ const emailAlreadyInUse = (newEmail) => {
     }
   }
   return false;
+};
+
+const findUserViaEmail = (email) => {
+  for (const user in users) {
+    if (users[user].email === email) {
+      return users[user];
+    }
+  }
+  return null;
 };
 
 
