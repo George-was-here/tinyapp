@@ -28,13 +28,19 @@ const users = {
 };
 
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    user: null,
-    urls: urlDatabase };
   if (req.cookies && req.cookies["user_id"]) {
-    templateVars.user = users[req.cookies["user_id"]];
+    const templateVars = {
+      user: null,
+      urls: urlsForUser(req.cookies["user_id"]) };
+    if (req.cookies && req.cookies["user_id"]) {
+      templateVars.user = users[req.cookies["user_id"]];
+    }
+    res.render("urls_index", templateVars);
+    return;
   }
-  res.render("urls_index", templateVars);
+  res.status(403);
+  res.end("403: Error, user must login to see URLs!");
+  return;
 });
 
 app.get("/urls/new", (req, res) => {
@@ -58,8 +64,18 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, user: null, longURL: urlDatabase[req.params.shortURL].longURL };
   if (req.cookies && req.cookies["user_id"]) {
     templateVars.user = users[req.cookies["user_id"]];
+    if (urlDatabase[req.params.shortURL].userid === req.cookies["user_id"]) {
+      res.render("urls_show", templateVars);
+      return;
+    } else {
+      res.status(403);
+      res.end("403: Error, query item does not match account holdings!");
+      return;
+    }
   }
-  res.render("urls_show", templateVars);
+  res.status(403);
+  res.end("403: Error, user must login to see URLs!");
+  return;
 });
 
 
@@ -109,13 +125,27 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL].longURL;
-  res.redirect("/urls/");
+  if (urlDatabase[req.params.shortURL].userid === req.cookies["user_id"]) {
+    delete urlDatabase[req.params.shortURL].longURL;
+    res.redirect("/urls/");
+    return;
+  } else {
+    res.status(403);
+    res.end("403: Error, you don't have permission to delete items not pertaining to your account!");
+    return;
+  }
 });
 
 app.post("/urls/:shortURL/update", (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.updatedURL;
-  res.redirect("/urls/");
+  if (urlDatabase[req.params.shortURL].userid === req.cookies["user_id"]) {
+    urlDatabase[req.params.shortURL].longURL = req.body.updatedURL;
+    res.redirect("/urls/");
+    return;
+  } else {
+    res.status(403);
+    res.end("403: Error, you don't have permission to modify items not pertaining to your account!");
+    return;
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -137,9 +167,6 @@ app.post("/login", (req, res) => {
     res.redirect("/urls/");
   }
 });
-
-// If a user with that e-mail address is located, compare the password given in the form with the existing user's password. If it does not match, return a response with a 403 status code.
-// If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
@@ -193,6 +220,16 @@ const findUserViaEmail = (email) => {
     }
   }
   return null;
+};
+
+const urlsForUser = (userid) => {
+  const accountURLs = {};
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userid === userid) {
+      accountURLs[url] = urlDatabase[url];
+    }
+  }
+  return accountURLs;
 };
 
 
