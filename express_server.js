@@ -135,7 +135,7 @@ app.post("/login", (req, res) => {
 // If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls/");
 });
 
