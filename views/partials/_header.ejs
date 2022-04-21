@@ -9,16 +9,14 @@
           <a class="nav-item nav-link" href="/urls">My URLs</a>
           <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
           <div style="position:absolute;right: 0; margin-right: 20px;">
-            <form method="POST" action=<%= user ? '/logout' : '/login' %>>
+            <form method="POST" action=<%= '/logout' %>>
               <div class="input-group mb-3">
                 <% if(user) {%>
                 <span>Logged in as: <%= user.email %>! </span>
                 <button class="btn btn-primary" type="submit">Logout</button>
                 <% } else { %>
-                <input type="text" class="form-control" placeholder="Username" aria-label="Username" name="username" aria-describedby="basic-addon2">
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="submit">Login</button>
-                </div>
+                <a class="btn btn-primary" role="button" style="color:goldenrod;background-color:rgb(30, 61, 147);" href=<%= `/login` %>>Login</a>
+                <a class="btn btn-primary" role="button" style="color:goldenrod;background-color:rgb(30, 61, 147);" href=<%= `/register` %>>Register</a>
     
                 <% } %>
               </div>
