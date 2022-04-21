@@ -41,9 +41,9 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: null,
     urls: urlDatabase };
-    if (req.cookies && req.cookies["user_id"]) {
-      templateVars.user = users[req.cookies["user_id"]];
-    }
+  if (req.cookies && req.cookies["user_id"]) {
+    templateVars.user = users[req.cookies["user_id"]];
+  }
   res.render("urls_new", templateVars);
 });
 
@@ -99,7 +99,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:shortURL/update", (req, res) => {
-  // console.log("REQ", req);
   urlDatabase[req.params.shortURL] = req.body.updatedURL;
   res.redirect("/urls/");
 });
@@ -115,16 +114,26 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log(req);
+  const emailValue = req.body.email;
+  const passwordValue = req.body.password;
+  if (emailValue === '' || passwordValue === '') {
+    res.status(400);
+    res.end("400: Error, cannot submit an empty email/password.");
+    return;
+  }
+  if (emailAlreadyInUse(emailValue)) {
+    res.status(400);
+    res.end("400: Error, email already in use!");
+    return;
+  }
   const id  = generateRandomString();
   const user = {
     id: id,
-    email: req.body.email,
-    password: req.body.password
+    email: emailValue,
+    password: passwordValue
   };
   users[id] = user;
   res.cookie("user_id", id);
-  console.log(users);
   res.redirect(`/urls`);
 });
 
@@ -135,6 +144,14 @@ const generateRandomString = () => {
   return Buffer.from(Math.random().toString()).toString("base64").substr(10, 6);
 };
 
+const emailAlreadyInUse = (newEmail) => {
+  for (const user in users) {
+    if (users[user].email === newEmail) {
+      return true;
+    }
+  }
+  return false;
+};
 
 
 app.listen(PORT, () => {
