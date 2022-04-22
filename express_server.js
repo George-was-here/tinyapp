@@ -3,11 +3,13 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 let cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 app.set("view engine", "ejs");
+const salt = bcrypt.genSaltSync(10);
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userid: "userRandomID" },
@@ -158,7 +160,7 @@ app.post("/login", (req, res) => {
   }
   const user = findUserViaEmail(emailValue);
   if (user) {
-    if (user.password !== passwordValue) {
+    if (!bcrypt.compareSync(passwordValue, user.password)) {
       res.status(403);
       res.end("403: Error, password is invalid.");
       return;
@@ -190,7 +192,7 @@ app.post("/register", (req, res) => {
   const user = {
     id: id,
     email: emailValue,
-    password: passwordValue
+    password: bcrypt.hashSync(passwordValue, salt),
   };
   users[id] = user;
   res.cookie("user_id", id);
