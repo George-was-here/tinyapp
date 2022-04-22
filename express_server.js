@@ -29,14 +29,16 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", salt)
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", salt)
   }
 };
+
+const emailAlreadyInUse = require('./helpers/emailAlreadyInUse');
 
 app.get("/urls", (req, res) => {
   if (req.session && req.session["user_id"]) {
@@ -162,7 +164,8 @@ app.post("/urls/:shortURL/update", (req, res) => {
 app.post("/login", (req, res) => {
   const emailValue = req.body.email;
   const passwordValue = req.body.password;
-  if (!emailAlreadyInUse(emailValue)) {
+  if (!emailAlreadyInUse(users, emailValue)) {
+    console.log("Email value", emailValue);
     res.status(403);
     res.end("403: Error, email could not be located!");
     return;
@@ -170,6 +173,8 @@ app.post("/login", (req, res) => {
   const user = findUserViaEmail(emailValue);
   if (user) {
     if (!bcrypt.compareSync(passwordValue, user.password)) {
+      console.log(user.password);
+      console.log(passwordValue);
       res.status(403);
       res.end("403: Error, password is invalid.");
       return;
@@ -178,6 +183,8 @@ app.post("/login", (req, res) => {
     res.redirect("/urls/");
   }
 });
+
+
 
 app.post("/logout", (req, res) => {
   req.session = null
@@ -192,7 +199,10 @@ app.post("/register", (req, res) => {
     res.end("400: Error, cannot submit an empty email/password.");
     return;
   }
-  if (emailAlreadyInUse(emailValue)) {
+  if (emailAlreadyInUse(users, emailValue)) {
+    console.log(emailValue);
+    console.log(req.body.email);
+    console.log(users[user].email);
     res.status(400);
     res.end("400: Error, email already in use!");
     return;
@@ -214,15 +224,6 @@ app.post("/register", (req, res) => {
 
 const generateRandomString = () => {
   return Buffer.from(Math.random().toString()).toString("base64").substr(10, 6);
-};
-
-const emailAlreadyInUse = (newEmail) => {
-  for (const user in users) {
-    if (users[user].email === newEmail) {
-      return true;
-    }
-  }
-  return false;
 };
 
 const findUserViaEmail = (email) => {
