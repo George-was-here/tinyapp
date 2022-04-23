@@ -19,6 +19,11 @@ describe('emailAlreadyInUse', function() {
   it('should return a user with valid email', function() {
     const user = emailAlreadyInUse("user@example.com", testUsers)
     const expectedUserID = "userRandomID";
-    "userRandomID should equivalate to user@example.com email"
+    assert.isOk(true, 'this will return true');
   });
+  it('should return undefined if given a non-existent email', function() {
+      const user = emailAlreadyInUse("alphanumeric@example.com", testUsers)
+      const expectedUserID = "Enzo";
+      assert.isUndefined(user, 'undefined');
+    });  
 });
