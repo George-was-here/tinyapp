@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
 require("dotenv").config();
@@ -8,10 +7,9 @@ require("dotenv").config();
 const { emailAlreadyInUse, generateRandomString, findUserViaEmail, urlsForUser } = require('./helpers');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(
   cookieSession({
     name: "session",

@@ -4,7 +4,7 @@ const emailAlreadyInUse = (users, newEmail) => {
       return true;
     }
   }
-  return false;
+  return undefined;
 };
 
 const generateRandomString = () => {
