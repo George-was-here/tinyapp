@@ -1,10 +1,14 @@
 const express = require("express");
-const app = express();
-const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
+require("dotenv").config();
+
+const { emailAlreadyInUse, generateRandomString, findUserViaEmail, urlsForUser } = require('./helpers');
+
+const app = express();
+const PORT = process.env.PORT || 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -38,13 +42,11 @@ const users = {
   }
 };
 
-const emailAlreadyInUse = require('./helpers/emailAlreadyInUse');
-
 app.get("/urls", (req, res) => {
   if (req.session && req.session["user_id"]) {
     const templateVars = {
       user: null,
-      urls: urlsForUser(req.session["user_id"]) };
+      urls: urlsForUser(urlDatabase, req.session["user_id"]) };
     if (req.session && req.session["user_id"]) {
       templateVars.user = users[req.session["user_id"]];
     }
@@ -170,7 +172,7 @@ app.post("/login", (req, res) => {
     res.end("403: Error, email could not be located!");
     return;
   }
-  const user = findUserViaEmail(emailValue);
+  const user = findUserViaEmail(users, emailValue);
   if (user) {
     if (!bcrypt.compareSync(passwordValue, user.password)) {
       console.log(user.password);
@@ -184,10 +186,8 @@ app.post("/login", (req, res) => {
   }
 });
 
-
-
 app.post("/logout", (req, res) => {
-  req.session = null
+  req.session = null;
   res.redirect("/urls/");
 });
 
@@ -217,34 +217,6 @@ app.post("/register", (req, res) => {
   req.session['user_id']  = id;
   res.redirect(`/urls`);
 });
-
-
-
-
-
-const generateRandomString = () => {
-  return Buffer.from(Math.random().toString()).toString("base64").substr(10, 6);
-};
-
-const findUserViaEmail = (email) => {
-  for (const user in users) {
-    if (users[user].email === email) {
-      return users[user];
-    }
-  }
-  return null;
-};
-
-const urlsForUser = (userid) => {
-  const accountURLs = {};
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].userid === userid) {
-      accountURLs[url] = urlDatabase[url];
-    }
-  }
-  return accountURLs;
-};
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
